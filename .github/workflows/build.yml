@@ -24,14 +24,18 @@ jobs:
     - name: Build project
       run: npm run build
 
-    - name: Deploy to GitHub Pages
-      run: |
-        mkdir -p docs
-        cp -R dist/* docs/
+    - name: Ensure `docs` directory exists
+      run: mkdir -p docs
+
+    - name: Copy build files to `docs`
+      run: cp -R dist/* docs/
+
     - name: Commit and push changes
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git add docs
         git commit -m 'Deploy to GitHub Pages'
-        git push
+        git push https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git HEAD:main
