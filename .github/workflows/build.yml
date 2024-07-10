@@ -30,12 +30,17 @@ jobs:
     - name: Copy build files to `docs`
       run: cp -R dist/* docs/
 
+    - name: Add SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
     - name: Commit and push changes
       env:
-        FGH_TOKEN: ${{ secrets.FGH_TOKEN }}
+        GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
       run: |
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
         git add docs
         git commit -m 'Deploy to GitHub Pages'
-        git push https://x-access-token:${{ secrets.FGH_TOKEN }}@github.com/assistable-ai/retell-sdk-bundle.git HEAD:main
+        git push git@github.com:assistable-ai/retell-sdk-bundle.git HEAD:main
